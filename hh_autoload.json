@@ -1,0 +1,9 @@
+{
+    "roots": [
+        "src/Nuxed/Filesystem/"
+    ],
+    "devRoots": [
+        "test/Nuxed/Filesystem/"
+    ],
+    "devFailureHandler": "Facebook\\AutoloadMap\\HHClientFallbackHandler"
+}

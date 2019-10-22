@@ -1,0 +1,37 @@
+{
+    "name": "nuxed/filesystem",
+    "type": "library",
+    "description": "Nuxed Filesystem Library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "azjezz",
+            "email": "azjezz@protonmail.com"
+        },
+        {
+            "name": "Nuxed Community",
+            "homepage": "https://github.com/nuxed/filesystem/graphs/contributors"
+        }
+    ],
+    "require": {
+        "hhvm": "^4.25",
+        "hhvm/hsl": "^4.25",
+        "hhvm/hsl-experimental": "^4.25"
+    },
+    "require-dev": {
+        "facebook/fbexpect": "^2.7",
+        "hhvm/hacktest": "^1.6",
+        "hhvm/hhast": "^4.25",
+        "nuxed/crypto": "^1.0"
+    },
+    "scripts": {
+        "check": [
+            "@type-check",
+            "@lint",
+            "@test"
+        ],
+        "lint": "hhast-lint -v src/",
+        "test": "hacktest test/",
+        "type-check": "hh_client src/"
+    }
+}
