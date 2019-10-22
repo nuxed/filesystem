@@ -115,51 +115,67 @@ final class Folder extends Node {
     OperationType $process = OperationType::MERGE,
     int $mode = 0755,
   ): Awaitable<Folder> {
-    $target = Path::create($target);
     $this->isAvailable();
-    // Delete the target folder if overwrite is true
-    if ($process === OperationType::OVERWRITE && $target->exists()) {
-      await static::destroy($target->toString());
-    }
-
+    $this->reset($this->path->toString());
     // Create the target folder and reset folder path
-    $destination = new Folder($target->toString());
-    if (!$destination->exists()) {
+    $destination = new Folder($target);
+
+    // Flush the destination folder if overwrite is true
+    if ($process === OperationType::OVERWRITE && $destination->exists()) {
+      await $destination->flush();
+      await $destination->chmod($mode, true);
+    } else if (!$destination->exists()) {
       await $destination->create($mode);
     }
 
     $target = $destination->path();
 
-    // Recursively copy over contents to new destination
-    $contents = await $this->list<Node>(false, true);
+    // Recursively copy child folders.
+    $children = await $this->list<Folder>(false, true);
+    $lastOperation = async {
+    };
+    foreach ($children as $child) {
+      $lastOperation = async {
+        await $lastOperation;
+        $to = Path::create(Str\replace(
+          $child->path()->toString(),
+          $this->path->toString(),
+          $target->toString(),
+        ));
+        // Skip copy if target exists
+        if ($process === OperationType::SKIP && $to->exists()) {
+          return;
+        }
 
-    $awaitables = vec[];
-    foreach ($contents as $node) {
-      $to = Path::create(Str\replace(
-        $node->path()->toString(),
-        $this->path->toString(),
-        $target->toString(),
-      ));
-
-      // Skip copy if target exists
-      if ($process === OperationType::SKIP && $to->exists()) {
-        continue;
-      }
-
-      $destroy = async {
+        await $child->copy($to->toString(), $process, $mode);
       };
-      // Delete target since File::copy() will throw exception
-      if ($process === OperationType::MERGE && $to->exists() && $to->isFile()) {
-        $destroy = Node::destroy($to->toString());
-      }
+    }
 
-      $awaitables[] = async {
-        await $destroy;
+    // copy over contents to new destination
+    $contents = await $this->list<File>(false, false);
+    foreach ($contents as $node) {
+      $lastOperation = async {
+        await $lastOperation;
+        $to = Path::create(Str\replace(
+          $node->path()->toString(),
+          $this->path->toString(),
+          $target->toString(),
+        ));
+        // Skip copy if target exists
+        if ($process === OperationType::SKIP && $to->exists()) {
+          return;
+        }
+
+        // Delete target since File::copy() will throw exception
+        if ($process === OperationType::MERGE && $to->exists()) {
+          await Node::destroy($to->toString());
+        }
+
         await $node->copy($to->toString(), $process, $mode);
       };
     }
 
-    await Asio\v($awaitables);
+    await $lastOperation;
     $this->reset();
     return $destination;
   }
@@ -171,6 +187,7 @@ final class Folder extends Node {
   public async function delete(): Awaitable<bool> {
     $this->isAvailable();
     await $this->flush();
+    $this->reset();
     $deleted = @\rmdir($this->path->toString()) as bool;
     $this->reset();
     return $deleted;
