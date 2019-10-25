@@ -1,5 +1,5 @@
 {
-  "roots": [ "src/Nuxed/Filesystem/" ],
+  "roots": [ "src/" ],
   "builtinLinters": "all",
   "disableAllAutoFixes": false,
   "disabledLinters": [
