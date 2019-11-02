@@ -19,10 +19,6 @@ This package can be installed with [Composer](https://getcomposer.org).
 $ composer require nuxed/filesystem
 ```
 
-### Documentation
-
-Documentation for Nuxed Filesystem can be found in this repository under the [docs](docs/README.md) folder.
-
 ### Example
 
 ```hack
@@ -48,10 +44,10 @@ async function main(): void {
 
 ### Security
 
-For information on reporting security vulnerabilities in Nuxed Filesystem, see [SECURITY.md](SECURITY.md).
+For information on reporting security vulnerabilities in Nuxed, see [SECURITY.md](SECURITY.md).
 
 ---
 
 ### License
 
-The Nuxed Filesystem library is open-sourced software licensed under the MIT-licensed.
+Nuxed is open-sourced software licensed under the MIT-licensed.
