@@ -1,7 +1,7 @@
 {
     "name": "nuxed/filesystem",
     "type": "library",
-    "description": "Nuxed Filesystem Library",
+    "description": "Nuxed Filesystem",
     "license": "MIT",
     "authors": [
         {

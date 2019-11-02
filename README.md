@@ -8,8 +8,8 @@
 </p>
 
 # Nuxed Filesystem
- 
-Nuxed Filesystem provides classes that interact with the local filesystem. Specialized classes can be used to read data, write data, alter permissions, rename files, copy, create, delete, move, traverse, and many more through an easy to use interface.
+
+The Nuxed Filesystem component provides classes that interact with the local filesystem. Specialized classes can be used to read data, write data, alter permissions, rename files, copy, create, delete, move, traverse, and many more through an easy to use interface.
 
 ### Installation
 
@@ -25,7 +25,7 @@ $ composer require nuxed/filesystem
 use namespace Nuxed\Filesystem;
 
 <<__EntryPoint>>
-async function main(): void {
+async function main(): Awaitable<void> {
   $file = new Filesystem\File('file.txt');
   await $file->create(0755);
 
