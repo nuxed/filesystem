@@ -2,7 +2,7 @@ namespace Nuxed\Filesystem;
 
 use namespace HH\Lib\{C, Str, Vec};
 
-final class Lines implements \Countable, \IteratorAggregate<string> {
+final class Lines implements \Countable, \IteratorAggregate<string>, IMemoizeParam {
   public function __construct(private Container<string> $lines) {
   }
 
@@ -36,5 +36,13 @@ final class Lines implements \Countable, \IteratorAggregate<string> {
 
   public function toString(): string {
     return Str\join($this->lines, "\n");
+  }
+
+  /**
+   * Serialize this object to a string that can be used as a
+   * dictionary key to differentiate instances of this class.
+   */
+  public function getInstanceKey(): string {
+    return $this->toString();
   }
 }
