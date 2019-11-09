@@ -1,6 +1,7 @@
 namespace Nuxed\Filesystem;
 
 use namespace HH\Lib\{C, Str, Vec};
+use namespace HH\Lib\Experimental\File;
 
 final class Lines implements \Countable, \IteratorAggregate<string>, IMemoizeParam {
   public function __construct(private Container<string> $lines) {

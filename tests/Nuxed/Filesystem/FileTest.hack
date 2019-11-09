@@ -55,9 +55,9 @@ class FileTest extends HackTest\HackTest {
     $this->markAsSkippedIfRoot();
 
     await $file->chmod(0000);
-    expect(async () ==> {
-      await using $handle = $file->getReadHandle();
-    })->toThrow(Filesystem\Exception\UnreadableNodeException::class);
+    expect(async () ==> $file->getReadHandle())->toThrow(
+      Filesystem\Exception\UnreadableNodeException::class,
+    );
   }
 
   <<HackTest\DataProvider('provideNodes')>>
@@ -68,9 +68,9 @@ class FileTest extends HackTest\HackTest {
 
     // execute only
     await $file->chmod(0111);
-    expect(async () ==> {
-      await using $handle = $file->getWriteHandle();
-    })->toThrow(Filesystem\Exception\UnwritableNodeException::class);
+    expect(async () ==> $file->getWriteHandle())->toThrow(
+      Filesystem\Exception\UnwritableNodeException::class,
+    );
   }
 
   <<HackTest\DataProvider('provideNodes')>>
@@ -78,19 +78,19 @@ class FileTest extends HackTest\HackTest {
     Filesystem\File $file,
   ): Awaitable<void> {
     await $file->write('foo');
-    await using ($handle = $file->getReadHandle()) {
-      $content = await $handle->readAsync();
-      expect($content)->toBeSame('foo');
-    }
+    $handle = $file->getReadHandle();
+    $content = await $handle->readAsync();
+    expect($content)->toBeSame('foo');
+    await $handle->closeAsync();
   }
 
   <<HackTest\DataProvider('provideNodes')>>
   public async function testGetWriteHandle(
     Filesystem\File $file,
   ): Awaitable<void> {
-    await using ($handle = $file->getWriteHandle()) {
-      await $handle->writeAsync('foo');
-    }
+    $handle = $file->getWriteHandle();
+    await $handle->writeAsync('foo');
+    await $handle->closeAsync();
 
     $content = await $file->read();
     expect($content)->toBeSame('foo');
@@ -240,7 +240,10 @@ class FileTest extends HackTest\HackTest {
   ): Container<(Filesystem\Path, ?string)> {
     return vec[
       tuple(Filesystem\Path::create('/foo/bar/path/to/binary'), null),
-      tuple(Filesystem\Path::create('/foo/bar/path/to/hhvm-4-main.hack'), 'hack'),
+      tuple(
+        Filesystem\Path::create('/foo/bar/path/to/hhvm-4-main.hack'),
+        'hack',
+      ),
       tuple(Filesystem\Path::create('/foo/bar/path/to/hhvm-3-main.hh'), 'hh'),
       tuple(Filesystem\Path::create('/foo/bar/config.yml'), 'yml'),
       tuple(Filesystem\Path::create('/foo/bar/.gitignore'), 'gitignore'),
@@ -330,7 +333,9 @@ class FileTest extends HackTest\HackTest {
     Filesystem\File $file,
     Filesystem\Path $path,
   ): void {
-    expect($file->reset($path->toString())->path()->toString())->toBeSame($path->toString());
+    expect($file->reset($path->toString())->path()->toString())->toBeSame(
+      $path->toString(),
+    );
   }
 
   public async function provideResetData(

@@ -4,13 +4,12 @@ use namespace HH\Lib\Str;
 use namespace HH\Lib\Experimental\File;
 
 final class File extends Node {
-  <<__ReturnDisposable>>
-  public function getReadHandle(): File\DisposableReadHandle {
+  public function getReadHandle(): File\NonDisposableReadHandle {
     $this->isAvailable();
     $this->isReadable();
 
     try {
-      return File\open_read_only($this->path->toString());
+      return File\open_read_only_nd($this->path->toString());
     } catch (\Exception $e) {
       throw new Exception\RuntimeException(
         Str\format(
@@ -23,10 +22,9 @@ final class File extends Node {
     }
   }
 
-  <<__ReturnDisposable>>
   public function getWriteHandle(
     File\WriteMode $mode = File\WriteMode::OPEN_OR_CREATE,
-  ): File\DisposableWriteHandle {
+  ): File\NonDisposableWriteHandle {
     if ($mode === File\WriteMode::MUST_CREATE && $this->exists()) {
       throw new Exception\ExistingNodeException(Str\format(
         'Cannot re-create file (%s) for writing.',
@@ -55,7 +53,7 @@ final class File extends Node {
     }
 
     try {
-      return File\open_write_only($this->path->toString(), $mode);
+      return File\open_write_only_nd($this->path->toString(), $mode);
     } catch (\Exception $e) {
       throw new Exception\RuntimeException(
         Str\format(
@@ -69,10 +67,9 @@ final class File extends Node {
     }
   }
 
-  <<__ReturnDisposable>>
   public function getReadWriteHandle(
     File\WriteMode $mode = File\WriteMode::OPEN_OR_CREATE,
-  ): File\DisposableReadWriteHandle {
+  ): File\NonDisposableReadWriteHandle {
     if ($mode === File\WriteMode::MUST_CREATE && $this->exists()) {
       throw new Exception\ExistingNodeException(Str\format(
         'Cannot re-create file (%s) for writing.',
@@ -105,7 +102,7 @@ final class File extends Node {
     }
 
     try {
-      return File\open_read_write($this->path()->toString(), $mode);
+      return File\open_read_write_nd($this->path()->toString(), $mode);
     } catch (\Exception $e) {
       throw new Exception\RuntimeException(
         Str\format(
@@ -307,11 +304,12 @@ final class File extends Node {
     File\WriteMode $mode = File\WriteMode::TRUNCATE,
   ): Awaitable<void> {
     try {
-      await using ($file = $this->getWriteHandle($mode)) {
+      $file = $this->getWriteHandle($mode);
         using ($_lock = $file->lock(File\LockType::EXCLUSIVE_NON_BLOCKING)) {
           await $file->writeAsync($data);
         }
-      }
+
+      await $file->closeAsync();
     } catch (\Exception $e) {
       throw new Exception\WriteErrorException(
         Str\format(
@@ -329,11 +327,12 @@ final class File extends Node {
    */
   public async function read(?int $length = null): Awaitable<string> {
     try {
-      await using ($handle = $this->getReadHandle()) {
+      $handle = $this->getReadHandle();
         using ($_lock = $handle->lock(File\LockType::SHARED_NON_BLOCKING)) {
           return await $handle->readAsync($length);
         }
-      }
+
+      await $handle->closeAsync();
     } catch (\Exception $e) {
       throw new Exception\ReadErrorException(
         Str\format(
