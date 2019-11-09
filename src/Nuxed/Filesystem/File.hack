@@ -305,9 +305,9 @@ final class File extends Node {
   ): Awaitable<void> {
     try {
       $file = $this->getWriteHandle($mode);
-        using ($_lock = $file->lock(File\LockType::EXCLUSIVE_NON_BLOCKING)) {
-          await $file->writeAsync($data);
-        }
+      using ($_lock = $file->lock(File\LockType::EXCLUSIVE_NON_BLOCKING)) {
+        await $file->writeAsync($data);
+      }
 
       await $file->closeAsync();
     } catch (\Exception $e) {
@@ -328,9 +328,9 @@ final class File extends Node {
   public async function read(?int $length = null): Awaitable<string> {
     try {
       $handle = $this->getReadHandle();
-        using ($_lock = $handle->lock(File\LockType::SHARED_NON_BLOCKING)) {
-          return await $handle->readAsync($length);
-        }
+      using ($_lock = $handle->lock(File\LockType::SHARED_NON_BLOCKING)) {
+        return await $handle->readAsync($length);
+      }
 
       await $handle->closeAsync();
     } catch (\Exception $e) {
