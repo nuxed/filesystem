@@ -3,7 +3,6 @@ namespace Nuxed\Filesystem;
 use namespace HH\Lib\{C, Str, Vec};
 
 final class Lines implements \Countable, \IteratorAggregate<string> {
-
   public function __construct(private Container<string> $lines) {
   }
 
@@ -13,9 +12,7 @@ final class Lines implements \Countable, \IteratorAggregate<string> {
 
   public function first(): string {
     if (C\is_empty($this->lines)) {
-      throw new Exception\OutOfRangeException(
-        'Lines instance is empty.',
-      );
+      throw new Exception\OutOfRangeException('Lines instance is empty.');
     }
 
     return C\firstx($this->lines);
@@ -33,7 +30,7 @@ final class Lines implements \Countable, \IteratorAggregate<string> {
     return Str\trim($line, " \t") === '';
   }
 
-  public function getIterator(): \Iterator<string> {
+  public function getIterator(): Iterator<string> {
     return (new Vector($this->lines))->getIterator();
   }
 
