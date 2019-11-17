@@ -304,12 +304,18 @@ final class File extends Node {
     File\WriteMode $mode = File\WriteMode::TRUNCATE,
   ): Awaitable<void> {
     try {
-      $file = $this->getWriteHandle($mode);
-      using ($_lock = $file->lock(File\LockType::EXCLUSIVE_NON_BLOCKING)) {
-        await $file->writeAsync($data);
+      $handle = $this->getWriteHandle($mode);
+      try {
+        using ($_lock = $handle->tryLockx(File\LockType::EXCLUSIVE)) {
+          await $handle->writeAsync($data);
+        }
+      } catch (File\AlreadyLockedException $e) {
+        using ($_lock = $handle->lock(File\LockType::EXCLUSIVE)) {
+          await $handle->writeAsync($data);
+        }
+      } finally {
+        await $handle->closeAsync();
       }
-
-      await $file->closeAsync();
     } catch (\Exception $e) {
       throw new Exception\WriteErrorException(
         Str\format(
@@ -328,11 +334,17 @@ final class File extends Node {
   public async function read(?int $length = null): Awaitable<string> {
     try {
       $handle = $this->getReadHandle();
-      using ($_lock = $handle->lock(File\LockType::SHARED_NON_BLOCKING)) {
-        return await $handle->readAsync($length);
+      try {
+        using ($_lock = $handle->tryLockx(File\LockType::SHARED)) {
+          return await $handle->readAsync($length);
+        }
+      } catch (File\AlreadyLockedException $e) {
+        using ($_lock = $handle->lock(File\LockType::SHARED)) {
+          return await $handle->readAsync($length);
+        }
+      } finally {
+        await $handle->closeAsync();
       }
-
-      await $handle->closeAsync();
     } catch (\Exception $e) {
       throw new Exception\ReadErrorException(
         Str\format(
