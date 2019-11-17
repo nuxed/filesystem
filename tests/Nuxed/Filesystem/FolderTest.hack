@@ -99,10 +99,10 @@ class FolderTest extends HackTest {
     );
     expect($copy->exists())->toBeTrue();
     $copy as Filesystem\Folder;
-    list($folderSize, $copySize) = await Tuple\from_async(
-      $folder->size(),
-      $copy->size(),
-    );
+    concurrent {
+      $folderSize = await $folder->size();
+      $copySize = await $copy->size();
+    }
     expect($copySize)->toNotBeSame($targetSize);
     expect($copySize)->toBeSame($folderSize);
   }
@@ -118,11 +118,10 @@ class FolderTest extends HackTest {
     await $bar->write('bar');
     $baz = await $target->touch('foo.txt');
     await $baz->write('baz');
-
-    list($folderSize, $targetSize) = await Tuple\from_async(
-      $folder->size(),
-      $target->size(),
-    );
+    concurrent {
+      $folderSize = await $folder->size();
+      $targetSize = await $target->size();
+    }
     expect($folderSize)->toBeSame(2);
     expect($targetSize)->toBeSame(1);
 
@@ -130,11 +129,10 @@ class FolderTest extends HackTest {
       $target->path()->toString(),
       Filesystem\OperationType::SKIP,
     );
-
-    list($folderSize, $copySize) = await Tuple\from_async(
-      $folder->size(),
-      $copy->size(),
-    );
+    concurrent {
+      $folderSize = await $folder->size();
+      $copySize = await $copy->size();
+    }
     expect($copySize)->toNotBeSame($targetSize);
     expect($copySize)->toBeSame($folderSize);
 
@@ -159,11 +157,10 @@ class FolderTest extends HackTest {
     await $target->touch('hop.txt');
     $baz = await $target->touch('foo.txt');
     await $baz->write('baz');
-
-    list($folderSize, $targetSize) = await Tuple\from_async(
-      $folder->size(),
-      $target->size(),
-    );
+    concurrent {
+      $folderSize = await $folder->size();
+      $targetSize = await $target->size();
+    }
     expect($folderSize)->toBeSame(2);
     expect($targetSize)->toBeSame(3);
 
@@ -171,11 +168,10 @@ class FolderTest extends HackTest {
       $target->path()->toString(),
       Filesystem\OperationType::MERGE,
     );
-
-    list($folderSize, $copySize) = await Tuple\from_async(
-      $folder->size(),
-      $copy->size(),
-    );
+    concurrent {
+      $folderSize = await $folder->size();
+      $copySize = await $copy->size();
+    }
     expect($copySize)->toNotBeSame($targetSize);
     expect($copySize)->toBeSame(4);
 

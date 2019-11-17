@@ -16,11 +16,11 @@
     "require": {
         "hhvm": "^4.25",
         "hhvm/hsl": "^4.25",
-        "hhvm/hsl-experimental": "^4.25"
+        "hhvm/hsl-experimental": "^4.31"
     },
     "require-dev": {
         "facebook/fbexpect": "^2.7",
-        "hhvm/hacktest": "^1.6",
+        "hhvm/hacktest": "^2.0",
         "hhvm/hhast": "^4.25",
         "nuxed/crypto": "^1.0"
     },
