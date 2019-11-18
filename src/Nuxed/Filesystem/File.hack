@@ -118,8 +118,9 @@ final class File extends Node {
 
   public static async function temporary(
     string $perfix,
-    string $directory = \sys_get_temp_dir(),
+    ?string $directory = null,
   ): Awaitable<File> {
+    $directory ??= \sys_get_temp_dir();
     $folder = new Folder($directory);
     if (!$folder->exists()) {
       await $folder->create();
