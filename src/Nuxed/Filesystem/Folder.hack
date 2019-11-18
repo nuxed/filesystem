@@ -100,8 +100,9 @@ final class Folder extends Node {
         Str\format('Folder (%s) already exists.', $this->path->toString()),
       );
     }
-
-    $ret = @\mkdir($this->path->toString(), $mode, true) as bool;
+    $error_level = \error_reporting(0);
+    $ret = \mkdir($this->path->toString(), $mode, true) as bool;
+    \error_reporting($error_level);
     $this->reset();
     return $ret;
   }
@@ -188,7 +189,9 @@ final class Folder extends Node {
     $this->isAvailable();
     await $this->flush();
     $this->reset();
-    $deleted = @\rmdir($this->path->toString()) as bool;
+    $error_level = \error_reporting(0);
+    $deleted = \rmdir($this->path->toString()) as bool;
+    \error_reporting($error_level);
     $this->reset();
     return $deleted;
   }

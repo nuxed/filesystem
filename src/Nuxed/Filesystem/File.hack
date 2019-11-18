@@ -387,7 +387,9 @@ final class File extends Node {
       );
     }
 
-    @\symlink($this->path->toString(), $target->toString());
+    $error_level = \error_reporting(0);
+    \symlink($this->path->toString(), $target->toString());
+    \error_reporting($error_level);
     if (!$target->exists() || !$target->isSymlink()) {
       throw new Exception\RuntimeException(Str\format(
         'Error while creating a symbolic link (%s) for file (%s).',
@@ -411,7 +413,9 @@ final class File extends Node {
       );
     }
 
-    @\link($this->path->toString(), $link->toString());
+    $error_level = \error_reporting(0);
+    \link($this->path->toString(), $link->toString());
+    \error_reporting($error_level);
     if (!$link->exists()) {
       throw new Exception\RuntimeException(Str\format(
         'Error while creating a hard link (%s) for file (%s).',
