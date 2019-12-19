@@ -4,7 +4,7 @@ use namespace HH\Lib\Str;
 use namespace HH\Lib\Experimental\File;
 
 final class File extends Node {
-  public function getReadHandle(): File\NonDisposableReadHandle {
+  public function getReadHandle(): File\CloseableReadHandle {
     $this->isAvailable();
     $this->isReadable();
 
@@ -24,7 +24,7 @@ final class File extends Node {
 
   public function getWriteHandle(
     File\WriteMode $mode = File\WriteMode::OPEN_OR_CREATE,
-  ): File\NonDisposableWriteHandle {
+  ): File\CloseableWriteHandle {
     if ($mode === File\WriteMode::MUST_CREATE && $this->exists()) {
       throw new Exception\ExistingNodeException(Str\format(
         'Cannot re-create file (%s) for writing.',
@@ -69,7 +69,7 @@ final class File extends Node {
 
   public function getReadWriteHandle(
     File\WriteMode $mode = File\WriteMode::OPEN_OR_CREATE,
-  ): File\NonDisposableReadWriteHandle {
+  ): File\CloseableReadWriteHandle {
     if ($mode === File\WriteMode::MUST_CREATE && $this->exists()) {
       throw new Exception\ExistingNodeException(Str\format(
         'Cannot re-create file (%s) for writing.',
