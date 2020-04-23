@@ -4,7 +4,7 @@ use namespace HH\Asio;
 use namespace Nuxed\Crypto\Hex;
 use namespace Nuxed\Filesystem;
 use namespace HH\Lib\Str;
-use namespace HH\Lib\Experimental\File;
+use namespace HH\Lib\File;
 use namespace Facebook\HackTest;
 use function Facebook\FBExpect\expect;
 

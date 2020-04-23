@@ -1,7 +1,6 @@
 namespace Nuxed\Filesystem;
 
-use namespace HH\Lib\Str;
-use namespace HH\Lib\Experimental\File;
+use namespace HH\Lib\{File, Str};
 
 final class File extends Node {
   public function getReadHandle(): File\CloseableReadHandle {
