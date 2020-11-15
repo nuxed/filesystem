@@ -304,11 +304,13 @@ class FileTest extends HackTest\HackTest {
         'text/plain',
       ),
       tuple(
-        Filesystem\Path::create(__DIR__.'/../../../.travis.sh'),
-        'text/x-shellscript',
+        Filesystem\Path::create(__DIR__.'/../../../.github/workflows/hhvm.gpg'),
+        'application/pgp-keys',
       ),
       tuple(
-        Filesystem\Path::create(__DIR__.'/../../../.travis.yml'),
+        Filesystem\Path::create(
+          __DIR__.'/../../../.github/workflows/unit-tests.yml',
+        ),
         'text/plain',
       ),
       tuple(Filesystem\Path::create(__DIR__.'/../../../LICENSE'), 'text/plain'),
