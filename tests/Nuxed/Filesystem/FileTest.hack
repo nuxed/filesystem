@@ -81,7 +81,7 @@ class FileTest extends HackTest\HackTest {
     $handle = $file->getReadHandle();
     $content = await $handle->readAsync();
     expect($content)->toBeSame('foo');
-    await $handle->closeAsync();
+    $handle->close();
   }
 
   <<HackTest\DataProvider('provideNodes')>>
@@ -90,7 +90,7 @@ class FileTest extends HackTest\HackTest {
   ): Awaitable<void> {
     $handle = $file->getWriteHandle();
     await $handle->writeAsync('foo');
-    await $handle->closeAsync();
+    $handle->close();
 
     $content = await $file->read();
     expect($content)->toBeSame('foo');

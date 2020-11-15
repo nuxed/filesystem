@@ -8,7 +8,7 @@ final class File extends Node {
     $this->isReadable();
 
     try {
-      return File\open_read_only_nd($this->path->toString());
+      return File\open_read_only($this->path->toString());
     } catch (\Exception $e) {
       throw new Exception\RuntimeException(
         Str\format(
@@ -52,7 +52,7 @@ final class File extends Node {
     }
 
     try {
-      return File\open_write_only_nd($this->path->toString(), $mode);
+      return File\open_write_only($this->path->toString(), $mode);
     } catch (\Exception $e) {
       throw new Exception\RuntimeException(
         Str\format(
@@ -101,7 +101,7 @@ final class File extends Node {
     }
 
     try {
-      return File\open_read_write_nd($this->path()->toString(), $mode);
+      return File\open_read_write($this->path()->toString(), $mode);
     } catch (\Exception $e) {
       throw new Exception\RuntimeException(
         Str\format(
@@ -305,6 +305,7 @@ final class File extends Node {
   ): Awaitable<void> {
     try {
       $handle = $this->getWriteHandle($mode);
+
       try {
         using ($_lock = $handle->tryLockx(File\LockType::EXCLUSIVE)) {
           await $handle->writeAsync($data);
@@ -314,7 +315,7 @@ final class File extends Node {
           await $handle->writeAsync($data);
         }
       } finally {
-        await $handle->closeAsync();
+        $handle->close();
       }
     } catch (\Exception $e) {
       throw new Exception\WriteErrorException(
@@ -343,7 +344,7 @@ final class File extends Node {
           return await $handle->readAsync($length);
         }
       } finally {
-        await $handle->closeAsync();
+        $handle->close();
       }
     } catch (\Exception $e) {
       throw new Exception\ReadErrorException(
